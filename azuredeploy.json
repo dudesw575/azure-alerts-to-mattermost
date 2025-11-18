@@ -10,8 +10,7 @@
             }
         },
         "mattermostWebhookUrl": {
-            "defaultValue": "YOUR_MATTERMOST_WEBHOOK_URL_HERE",
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Mattermost inbound webhook URL"
             }
@@ -43,8 +42,8 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_azure_alert_mattermost_name')]",
-            "location": "usgovvirginia",
+            "name": "[parameters('logicAppName')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "state": "Enabled",
                 "definition": {
@@ -59,10 +58,6 @@
                         },
                         "mattermostUsername": {
                             "type": "String"
-                        },
-                        "$connections": {
-                            "defaultValue": {},
-                            "type": "Object"
                         }
                     },
                     "triggers": {
@@ -299,15 +294,27 @@
                     "outputs": {}
                 },
                 "parameters": {
-                    "mattermostWebhookUrl": {},
-                    "mattermostChannel": {},
-                    "mattermostUsername": {},
-                    "$connections": {
-                        "type": "Object",
-                        "value": {}
+                    "mattermostWebhookUrl": {
+                        "value": "[parameters('mattermostWebhookUrl')]"
+                    },
+                    "mattermostChannel": {
+                        "value": "[parameters('mattermostChannel')]"
+                    },
+                    "mattermostUsername": {
+                        "value": "[parameters('mattermostUsername')]"
                     }
                 }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "logicAppName": {
+            "type": "string",
+            "value": "[parameters('logicAppName')]"
+        },
+        "triggerUrl": {
+            "type": "string",
+            "value": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/manual'), '2017-07-01').value]"
+        }
+    }
 }
