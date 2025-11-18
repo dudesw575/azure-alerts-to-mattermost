@@ -1,266 +1,323 @@
 {
-    "definition": {
-        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-        "contentVersion": "1.0.0.0",
-        "triggers": {
-            "manual": {
-                "type": "Request",
-                "kind": "Http",
-                "inputs": {
-                    "schema": {
-                        "$schema": "http://json-schema.org/draft-04/schema#",
-                        "type": "object",
-                        "properties": {
-                            "schemaId": {
-                                "type": "string"
-                            },
-                            "data": {
-                                "type": "object",
-                                "properties": {
-                                    "essentials": {
-                                        "type": "object",
-                                        "properties": {
-                                            "alertId": {
-                                                "type": "string"
-                                            },
-                                            "alertRule": {
-                                                "type": "string"
-                                            },
-                                            "severity": {
-                                                "type": "string"
-                                            },
-                                            "signalType": {
-                                                "type": "string"
-                                            },
-                                            "monitorCondition": {
-                                                "type": "string"
-                                            },
-                                            "monitoringService": {
-                                                "type": "string"
-                                            },
-                                            "alertTargetIDs": {
-                                                "type": "array"
-                                            },
-                                            "targetResourceGroup": {
-                                                "type": "string"
-                                            },
-                                            "configurationItems": {
-                                                "type": "array"
-                                            },
-                                            "originAlertId": {
-                                                "type": "string"
-                                            },
-                                            "firedDateTime": {
-                                                "type": "string"
-                                            },
-                                            "resolvedDateTime": {
-                                                "type": "string"
-                                            },
-                                            "description": {
-                                                "type": "string"
-                                            },
-                                            "essentialsVersion": {
-                                                "type": "string"
-                                            },
-                                            "alertContextVersion": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    },
-                                    "alertContext": {
-                                        "type": "object",
-                                        "properties": {
-                                            "condition": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "allOf": {
-                                                        "type": "array",
-                                                        "items": {
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "logicAppName": {
+            "type": "string",
+            "defaultValue": "azure-alerts-to-mattermost",
+            "metadata": {
+                "description": "Name of the Logic App"
+            }
+        },
+        "mattermostWebhookUrl": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Your Mattermost webhook URL"
+            }
+        },
+        "mattermostChannel": {
+            "type": "string",
+            "defaultValue": "gitlab-alerts",
+            "metadata": {
+                "description": "Mattermost channel to post alerts to"
+            }
+        },
+        "mattermostUsername": {
+            "type": "string",
+            "defaultValue": "Azure Alerts",
+            "metadata": {
+                "description": "Username to display in Mattermost"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('logicAppName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "triggers": {
+                        "manual": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "$schema": "http://json-schema.org/draft-04/schema#",
+                                    "type": "object",
+                                    "properties": {
+                                        "schemaId": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "essentials": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "alertId": {
+                                                            "type": "string"
+                                                        },
+                                                        "alertRule": {
+                                                            "type": "string"
+                                                        },
+                                                        "severity": {
+                                                            "type": "string"
+                                                        },
+                                                        "signalType": {
+                                                            "type": "string"
+                                                        },
+                                                        "monitorCondition": {
+                                                            "type": "string"
+                                                        },
+                                                        "monitoringService": {
+                                                            "type": "string"
+                                                        },
+                                                        "alertTargetIDs": {
+                                                            "type": "array"
+                                                        },
+                                                        "targetResourceGroup": {
+                                                            "type": "string"
+                                                        },
+                                                        "configurationItems": {
+                                                            "type": "array"
+                                                        },
+                                                        "originAlertId": {
+                                                            "type": "string"
+                                                        },
+                                                        "firedDateTime": {
+                                                            "type": "string"
+                                                        },
+                                                        "resolvedDateTime": {
+                                                            "type": "string"
+                                                        },
+                                                        "description": {
+                                                            "type": "string"
+                                                        },
+                                                        "essentialsVersion": {
+                                                            "type": "string"
+                                                        },
+                                                        "alertContextVersion": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "alertContext": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "condition": {
                                                             "type": "object",
                                                             "properties": {
-                                                                "linkToSearchResultsUI": {
-                                                                    "type": "string"
-                                                                },
-                                                                "linkToFilteredSearchResultsUI": {
-                                                                    "type": "string"
+                                                                "allOf": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "linkToSearchResultsUI": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "linkToFilteredSearchResultsUI": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    }
                                                                 }
                                                             }
                                                         }
                                                     }
+                                                },
+                                                "customProperties": {
+                                                    "type": "object"
                                                 }
                                             }
                                         }
-                                    },
-                                    "customProperties": {
-                                        "type": "object"
                                     }
                                 }
                             }
                         }
+                    },
+                    "actions": {
+                        "Compose_Portal_Link": {
+                            "type": "Compose",
+                            "inputs": "@coalesce(triggerBody()['data']['alertContext']?['condition']?['allOf']?[0]?['linkToSearchResultsUI'], concat('https://portal.azure.us/#blade/Microsoft_Azure_Monitoring/AlertsBladeViewModel/alertId/', triggerBody()['data']['essentials']['alertId']))"
+                        },
+                        "Compose_Resource_Link": {
+                            "type": "Compose",
+                            "inputs": "@concat('https://portal.azure.us/#@/resource', triggerBody()['data']['essentials']['alertTargetIDs'][0])",
+                            "runAfter": {
+                                "Compose_Portal_Link": [
+                                    "Succeeded"
+                                ]
+                            }
+                        },
+                        "Compose_Alert_Color": {
+                            "type": "Compose",
+                            "inputs": "@if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Fired'), '#FF4444', if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Resolved'), '#00C851', '#33B5E5'))",
+                            "runAfter": {
+                                "Compose_Resource_Link": [
+                                    "Succeeded"
+                                ]
+                            }
+                        },
+                        "Compose_Alert_Icon": {
+                            "type": "Compose",
+                            "inputs": "@if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Fired'), '🚨', if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Resolved'), '✅', 'ℹ️'))",
+                            "runAfter": {
+                                "Compose_Alert_Color": [
+                                    "Succeeded"
+                                ]
+                            }
+                        },
+                        "Compose_Human_Severity": {
+                            "type": "Compose",
+                            "inputs": "@if(equals(triggerBody()['data']['essentials']['severity'], 'Sev0'), 'Critical 🔥', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev1'), 'Error ⚠️', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev2'), 'Warning ⚡', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev3'), 'Informational 📋', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev4'), 'Verbose 📝', triggerBody()['data']['essentials']['severity'])))))",
+                            "runAfter": {
+                                "Compose_Alert_Icon": [
+                                    "Succeeded"
+                                ]
+                            }
+                        },
+                        "Compose_Formatted_Time": {
+                            "type": "Compose",
+                            "inputs": "@formatDateTime(triggerBody()['data']['essentials']['firedDateTime'], 'MMM dd, yyyy h:mm tt')",
+                            "runAfter": {
+                                "Compose_Human_Severity": [
+                                    "Succeeded"
+                                ]
+                            }
+                        },
+                        "Post_to_Mattermost": {
+                            "runAfter": {
+                                "Compose_Formatted_Time": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "body": {
+                                    "channel": "@parameters('mattermostChannel')",
+                                    "username": "@parameters('mattermostUsername')",
+                                    "icon_emoji": ":azure:",
+                                    "attachments": [
+                                        {
+                                            "color": "@outputs('Compose_Alert_Color')",
+                                            "fallback": "Azure Alert: @{triggerBody()['data']['essentials']['alertRule']} is @{triggerBody()['data']['essentials']['monitorCondition']}",
+                                            "pretext": "@{outputs('Compose_Alert_Icon')} **Azure Monitor Alert**",
+                                            "author_name": "From: Azure @{triggerBody()['data']['essentials']['monitoringService']}",
+                                            "author_icon": "https://raw.githubusercontent.com/vscode-icons/vscode-icons/refs/heads/master/icons/file_type_azure.svg",
+                                            "title": "@{triggerBody()['data']['essentials']['alertRule']}",
+                                            "title_link": "@{outputs('Compose_Portal_Link')}",
+                                            "text": "@{if(empty(triggerBody()['data']['essentials']['description']), '_No description provided_', triggerBody()['data']['essentials']['description'])}",
+                                            "fields": [
+                                                {
+                                                    "title": "🎯 Status",
+                                                    "value": "@{triggerBody()['data']['essentials']['monitorCondition']}",
+                                                    "short": true
+                                                },
+                                                {
+                                                    "title": "🚨 Severity",
+                                                    "value": "@{outputs('Compose_Human_Severity')}",
+                                                    "short": true
+                                                },
+                                                {
+                                                    "title": "📊 Signal Type",
+                                                    "value": "@{triggerBody()['data']['essentials']['signalType']}",
+                                                    "short": true
+                                                },
+                                                {
+                                                    "title": "🏷️ Resource",
+                                                    "value": "[@{last(split(triggerBody()['data']['essentials']['alertTargetIDs'][0], '/'))}](@{outputs('Compose_Resource_Link')})",
+                                                    "short": true
+                                                },
+                                                {
+                                                    "title": "📁 Resource Group",
+                                                    "value": "@{triggerBody()['data']['essentials']['targetResourceGroup']}",
+                                                    "short": true
+                                                },
+                                                {
+                                                    "title": "🕐 Fired Time",
+                                                    "value": "@{outputs('Compose_Formatted_Time')} UTC",
+                                                    "short": true
+                                                }
+                                            ],
+                                            "actions": [
+                                                {
+                                                    "type": "button",
+                                                    "text": "🔍 View Alert Details",
+                                                    "url": "@{outputs('Compose_Portal_Link')}",
+                                                    "style": "primary"
+                                                },
+                                                {
+                                                    "type": "button",
+                                                    "text": "🔗 View Resource",
+                                                    "url": "@{outputs('Compose_Resource_Link')}",
+                                                    "style": "default"
+                                                }
+                                            ],
+                                            "footer": "Azure Monitor",
+                                            "footer_icon": "https://raw.githubusercontent.com/vscode-icons/vscode-icons/refs/heads/master/icons/file_type_azure.svg",
+                                            "ts": "@{div(sub(ticks(utcNow()), 621355968000000000), 10000000)}"
+                                        }
+                                    ]
+                                },
+                                "headers": {
+                                    "Content-Type": "application/json"
+                                },
+                                "method": "POST",
+                                "uri": "@parameters('mattermostWebhookUrl')"
+                            }
+                        }
+                    },
+                    "outputs": {},
+                    "parameters": {
+                        "mattermostWebhookUrl": {
+                            "type": "SecureString"
+                        },
+                        "mattermostChannel": {
+                            "type": "String"
+                        },
+                        "mattermostUsername": {
+                            "type": "String"
+                        }
+                    }
+                },
+                "parameters": {
+                    "mattermostWebhookUrl": {
+                        "value": "[parameters('mattermostWebhookUrl')]"
+                    },
+                    "mattermostChannel": {
+                        "value": "[parameters('mattermostChannel')]"
+                    },
+                    "mattermostUsername": {
+                        "value": "[parameters('mattermostUsername')]"
                     }
                 }
             }
-        },
-        "actions": {
-            "Compose_Portal_Link": {
-                "type": "Compose",
-                "inputs": "@coalesce(triggerBody()['data']['alertContext']?['condition']?['allOf']?[0]?['linkToSearchResultsUI'], concat('https://portal.azure.us/#blade/Microsoft_Azure_Monitoring/AlertsBladeViewModel/alertId/', triggerBody()['data']['essentials']['alertId']))"
-            },
-            "Compose_Resource_Link": {
-                "type": "Compose",
-                "inputs": "@concat('https://portal.azure.us/#@/resource', triggerBody()['data']['essentials']['alertTargetIDs'][0])",
-                "runAfter": {
-                    "Compose_Portal_Link": [
-                        "Succeeded"
-                    ]
-                }
-            },
-            "Compose_Alert_Color": {
-                "type": "Compose",
-                "inputs": "@if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Fired'), '#FF4444', if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Resolved'), '#00C851', '#33B5E5'))",
-                "runAfter": {
-                    "Compose_Resource_Link": [
-                        "Succeeded"
-                    ]
-                }
-            },
-            "Compose_Alert_Icon": {
-                "type": "Compose",
-                "inputs": "@if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Fired'), '🚨', if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Resolved'), '✅', 'ℹ️'))",
-                "runAfter": {
-                    "Compose_Alert_Color": [
-                        "Succeeded"
-                    ]
-                }
-            },
-            "Compose_Human_Severity": {
-                "type": "Compose",
-                "inputs": "@if(equals(triggerBody()['data']['essentials']['severity'], 'Sev0'), 'Critical 🔥', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev1'), 'Error ⚠️', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev2'), 'Warning ⚡', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev3'), 'Informational 📋', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev4'), 'Verbose 📝', triggerBody()['data']['essentials']['severity'])))))",
-                "runAfter": {
-                    "Compose_Alert_Icon": [
-                        "Succeeded"
-                    ]
-                }
-            },
-            "Compose_Formatted_Time": {
-                "type": "Compose",
-                "inputs": "@formatDateTime(triggerBody()['data']['essentials']['firedDateTime'], 'MMM dd, yyyy h:mm tt')",
-                "runAfter": {
-                    "Compose_Human_Severity": [
-                        "Succeeded"
-                    ]
-                }
-            },
-            "Post_to_Mattermost": {
-                "runAfter": {
-                    "Compose_Formatted_Time": [
-                        "Succeeded"
-                    ]
-                },
-                "type": "Http",
-                "inputs": {
-                    "body": {
-                        "channel": "@parameters('mattermostChannel')",
-                        "username": "@parameters('mattermostUsername')",
-                        "icon_emoji": ":azure:",
-                        "attachments": [
-                            {
-                                "color": "@outputs('Compose_Alert_Color')",
-                                "fallback": "Azure Alert: @{triggerBody()['data']['essentials']['alertRule']} is @{triggerBody()['data']['essentials']['monitorCondition']}",
-                                "pretext": "@{outputs('Compose_Alert_Icon')} **Azure Monitor Alert**",
-                                "author_name": "From: Azure @{triggerBody()['data']['essentials']['monitoringService']}",
-                                "author_icon": "https://raw.githubusercontent.com/vscode-icons/vscode-icons/refs/heads/master/icons/file_type_azure.svg",
-                                "title": "@{triggerBody()['data']['essentials']['alertRule']}",
-                                "title_link": "@{outputs('Compose_Portal_Link')}",
-                                "text": "@{if(empty(triggerBody()['data']['essentials']['description']), '_No description provided_', triggerBody()['data']['essentials']['description'])}",
-                                "fields": [
-                                    {
-                                        "title": "🎯 Status",
-                                        "value": "@{triggerBody()['data']['essentials']['monitorCondition']}",
-                                        "short": true
-                                    },
-                                    {
-                                        "title": "🚨 Severity",
-                                        "value": "@{outputs('Compose_Human_Severity')}",
-                                        "short": true
-                                    },
-                                    {
-                                        "title": "📊 Signal Type",
-                                        "value": "@{triggerBody()['data']['essentials']['signalType']}",
-                                        "short": true
-                                    },
-                                    {
-                                        "title": "🏷️ Resource",
-                                        "value": "[@{last(split(triggerBody()['data']['essentials']['alertTargetIDs'][0], '/'))}](@{outputs('Compose_Resource_Link')})",
-                                        "short": true
-                                    },
-                                    {
-                                        "title": "📁 Resource Group",
-                                        "value": "@{triggerBody()['data']['essentials']['targetResourceGroup']}",
-                                        "short": true
-                                    },
-                                    {
-                                        "title": "🕐 Fired Time",
-                                        "value": "@{outputs('Compose_Formatted_Time')} UTC",
-                                        "short": true
-                                    }
-                                ],
-                                "actions": [
-                                    {
-                                        "type": "button",
-                                        "text": "🔍 View Alert Details",
-                                        "url": "@{outputs('Compose_Portal_Link')}",
-                                        "style": "primary"
-                                    },
-                                    {
-                                        "type": "button",
-                                        "text": "🔗 View Resource",
-                                        "url": "@{outputs('Compose_Resource_Link')}",
-                                        "style": "default"
-                                    }
-                                ],
-                                "footer": "Azure Monitor",
-                                "footer_icon": "https://raw.githubusercontent.com/vscode-icons/vscode-icons/refs/heads/master/icons/file_type_azure.svg",
-                                "ts": "@{div(sub(ticks(utcNow()), 621355968000000000), 10000000)}"
-                            }
-                        ]
-                    },
-                    "headers": {
-                        "Content-Type": "application/json"
-                    },
-                    "method": "POST",
-                    "uri": "@parameters('mattermostWebhookUrl')"
-                }
-            }
-        },
-        "outputs": {},
-        "parameters": {
-            "mattermostWebhookUrl": {
-                "type": "SecureString"
-            },
-            "mattermostChannel": {
-                "type": "String"
-            },
-            "mattermostUsername": {
-                "type": "String"
-            },
-            "$connections": {
-                "type": "Object",
-                "defaultValue": {}
-            }
         }
-    },
-    "parameters": {
-        "mattermostWebhookUrl": {},
-        "mattermostChannel": {
-            "value": "gitlab-alerts"
+    ],
+    "outputs": {
+        "logicAppName": {
+            "type": "string",
+            "value": "[parameters('logicAppName')]"
         },
-        "mattermostUsername": {
-            "value": "Azure Alerts"
+        "triggerUrl": {
+            "type": "string",
+            "value": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/manual'), '2017-07-01').value]"
         },
-        "$connections": {
-            "type": "Object",
-            "value": {}
+        "resourceGroup": {
+            "type": "string",
+            "value": "[resourceGroup().name]"
         }
     }
 }
