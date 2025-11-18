@@ -2,10 +2,41 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_azure_alert_mattermost_name": {
+        "logicAppName": {
             "defaultValue": "azure-alert-mattermost",
-            "type": "String"
-        }
+            "type": "string",
+            "metadata": {
+                "description": "The name for the logic app."
+            }
+        },
+        "mattermostWebhookUrl": {
+            "defaultValue": "YOUR_MATTERMOST_WEBHOOK_URL_HERE",
+            "type": "string",
+            "metadata": {
+                "description": "Mattermost inbound webhook URL"
+            }
+        },
+        "mattermostChannel": {
+            "defaultValue": "general",
+            "type": "string",
+            "metadata":{
+                "description": "The Mattermost channel to post to"
+            }
+        },
+        "mattermostUsername":{
+            "defaultValue": "Azure Alerts",
+            "type": "string",
+            "metadata": {
+                "description": "The Username the Bot will use, can be anything meaningful"
+            }
+        },
+        "location": {
+          "type": "string",
+          "defaultValue": "[resourceGroup().location]",
+          "metadata": {
+            "description": "Location for all resources."
+          }
+       }
     },
     "variables": {},
     "resources": [
@@ -269,12 +300,8 @@
                 },
                 "parameters": {
                     "mattermostWebhookUrl": {},
-                    "mattermostChannel": {
-                        "value": "gitlab-alerts"
-                    },
-                    "mattermostUsername": {
-                        "value": "Azure Alerts"
-                    },
+                    "mattermostChannel": {},
+                    "mattermostUsername": {},
                     "$connections": {
                         "type": "Object",
                         "value": {}
