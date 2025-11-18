@@ -2,39 +2,9 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "logicAppName": {
-            "type": "string",
-            "defaultValue": "azure-alerts-to-mattermost",
-            "metadata": {
-                "description": "Name of the Logic App"
-            }
-        },
-        "mattermostWebhookUrl": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Your Mattermost webhook URL"
-            }
-        },
-        "mattermostChannel": {
-            "type": "string",
-            "defaultValue": "gitlab-alerts",
-            "metadata": {
-                "description": "Mattermost channel to post alerts to"
-            }
-        },
-        "mattermostUsername": {
-            "type": "string",
-            "defaultValue": "Azure Alerts",
-            "metadata": {
-                "description": "Username to display in Mattermost"
-            }
-        },
-        "location": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().location]",
-            "metadata": {
-                "description": "Location for all resources"
-            }
+        "workflows_azure_alert_mattermost_name": {
+            "defaultValue": "azure-alert-mattermost",
+            "type": "String"
         }
     },
     "variables": {},
@@ -42,12 +12,28 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('logicAppName')]",
-            "location": "[parameters('location')]",
+            "name": "[parameters('workflows_azure_alert_mattermost_name')]",
+            "location": "usgovvirginia",
             "properties": {
+                "state": "Enabled",
                 "definition": {
                     "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
                     "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "mattermostWebhookUrl": {
+                            "type": "SecureString"
+                        },
+                        "mattermostChannel": {
+                            "type": "String"
+                        },
+                        "mattermostUsername": {
+                            "type": "String"
+                        },
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
                     "triggers": {
                         "manual": {
                             "type": "Request",
@@ -153,49 +139,49 @@
                             "inputs": "@coalesce(triggerBody()['data']['alertContext']?['condition']?['allOf']?[0]?['linkToSearchResultsUI'], concat('https://portal.azure.us/#blade/Microsoft_Azure_Monitoring/AlertsBladeViewModel/alertId/', triggerBody()['data']['essentials']['alertId']))"
                         },
                         "Compose_Resource_Link": {
-                            "type": "Compose",
-                            "inputs": "@concat('https://portal.azure.us/#@/resource', triggerBody()['data']['essentials']['alertTargetIDs'][0])",
                             "runAfter": {
                                 "Compose_Portal_Link": [
                                     "Succeeded"
                                 ]
-                            }
+                            },
+                            "type": "Compose",
+                            "inputs": "@concat('https://portal.azure.us/#@/resource', triggerBody()['data']['essentials']['alertTargetIDs'][0])"
                         },
                         "Compose_Alert_Color": {
-                            "type": "Compose",
-                            "inputs": "@if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Fired'), '#FF4444', if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Resolved'), '#00C851', '#33B5E5'))",
                             "runAfter": {
                                 "Compose_Resource_Link": [
                                     "Succeeded"
                                 ]
-                            }
+                            },
+                            "type": "Compose",
+                            "inputs": "@if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Fired'), '#FF4444', if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Resolved'), '#00C851', '#33B5E5'))"
                         },
                         "Compose_Alert_Icon": {
-                            "type": "Compose",
-                            "inputs": "@if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Fired'), '🚨', if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Resolved'), '✅', 'ℹ️'))",
                             "runAfter": {
                                 "Compose_Alert_Color": [
                                     "Succeeded"
                                 ]
-                            }
+                            },
+                            "type": "Compose",
+                            "inputs": "@if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Fired'), '🚨', if(equals(triggerBody()['data']['essentials']['monitorCondition'], 'Resolved'), '✅', 'ℹ️'))"
                         },
                         "Compose_Human_Severity": {
-                            "type": "Compose",
-                            "inputs": "@if(equals(triggerBody()['data']['essentials']['severity'], 'Sev0'), 'Critical 🔥', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev1'), 'Error ⚠️', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev2'), 'Warning ⚡', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev3'), 'Informational 📋', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev4'), 'Verbose 📝', triggerBody()['data']['essentials']['severity'])))))",
                             "runAfter": {
                                 "Compose_Alert_Icon": [
                                     "Succeeded"
                                 ]
-                            }
+                            },
+                            "type": "Compose",
+                            "inputs": "@if(equals(triggerBody()['data']['essentials']['severity'], 'Sev0'), 'Critical 🔥', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev1'), 'Error ⚠️', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev2'), 'Warning ⚡', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev3'), 'Informational 📋', if(equals(triggerBody()['data']['essentials']['severity'], 'Sev4'), 'Verbose 📝', triggerBody()['data']['essentials']['severity'])))))"
                         },
                         "Compose_Formatted_Time": {
-                            "type": "Compose",
-                            "inputs": "@formatDateTime(triggerBody()['data']['essentials']['firedDateTime'], 'MMM dd, yyyy h:mm tt')",
                             "runAfter": {
                                 "Compose_Human_Severity": [
                                     "Succeeded"
                                 ]
-                            }
+                            },
+                            "type": "Compose",
+                            "inputs": "@formatDateTime(triggerBody()['data']['essentials']['firedDateTime'], 'MMM dd, yyyy h:mm tt')"
                         },
                         "Post_to_Mattermost": {
                             "runAfter": {
@@ -279,45 +265,22 @@
                             }
                         }
                     },
-                    "outputs": {},
-                    "parameters": {
-                        "mattermostWebhookUrl": {
-                            "type": "SecureString"
-                        },
-                        "mattermostChannel": {
-                            "type": "String"
-                        },
-                        "mattermostUsername": {
-                            "type": "String"
-                        }
-                    }
+                    "outputs": {}
                 },
                 "parameters": {
-                    "mattermostWebhookUrl": {
-                        "value": "[parameters('mattermostWebhookUrl')]"
-                    },
+                    "mattermostWebhookUrl": {},
                     "mattermostChannel": {
-                        "value": "[parameters('mattermostChannel')]"
+                        "value": "gitlab-alerts"
                     },
                     "mattermostUsername": {
-                        "value": "[parameters('mattermostUsername')]"
+                        "value": "Azure Alerts"
+                    },
+                    "$connections": {
+                        "type": "Object",
+                        "value": {}
                     }
                 }
             }
         }
-    ],
-    "outputs": {
-        "logicAppName": {
-            "type": "string",
-            "value": "[parameters('logicAppName')]"
-        },
-        "triggerUrl": {
-            "type": "string",
-            "value": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/manual'), '2017-07-01').value]"
-        },
-        "resourceGroup": {
-            "type": "string",
-            "value": "[resourceGroup().name]"
-        }
-    }
+    ]
 }
